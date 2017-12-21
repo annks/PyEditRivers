@@ -1,5 +1,5 @@
 from netCDF4 import Dataset
-from numpy import array, sign, where, round, argmin, abs, ones_like,squeeze, concatenate, delete
+from numpy import array, sign, where, round, argmin, abs, ones_like,squeeze, concatenate, delete, arange
 
 import os
 import matplotlib.pyplot as plt
@@ -18,8 +18,13 @@ class RomsGrid(object):
         self.ncfile = Dataset(filename, mode='r')
         self.lonr  = self.ncfile.variables['lon_rho'][:]
         self.latr  = self.ncfile.variables['lat_rho'][:]
-        self.xir  = self.ncfile.variables['xi_rho'][:]
-        self.etar  = self.ncfile.variables['eta_rho'][:]
+        try:
+            self.xir  = self.ncfile.variables['xi_rho'][:]
+            self.etar  = self.ncfile.variables['eta_rho'][:]
+        except KeyError:
+            self.xir = arange(self.lonr.shape[1])
+            self.etar = arange(self.lonr.shape[0])
+
         self.lonu  = self.ncfile.variables['lon_u'][:]
         self.latu  = self.ncfile.variables['lat_u'][:]
         self.lonv  = self.ncfile.variables['lon_v'][:]
@@ -173,7 +178,10 @@ class river(object):
         for key in rivervars:
             if rivervars[key][0] == 1:
                 var = fid.variables[rivervars[key][1]]
-                var[:] = self.__dict__[key][:]
+                if 'transport' in key:
+                    var[:] = abs(self.__dict__[key][:])*self.sign[:]
+                else:
+                    var[:] = self.__dict__[key][:]
             else:
                 continue
 
@@ -189,7 +197,10 @@ class river(object):
             for key in rivervars:
                 if rivervars[key][0] == 1:
                     var = fid.variables[rivervars[key][1]]
-                    var[:] = self.__dict__[key][:]
+                    if 'transport' in key:
+                        var[:] = abs(self.__dict__[key][:])*self.sign[:]
+                    else:
+                        var[:] = self.__dict__[key][:]
                 else:
                     continue
             fid.close()
@@ -198,13 +209,20 @@ class river(object):
             for key in rivervars:
                 if rivervars[key][0] == 1:
                     var = fid.variables[rivervars[key][1]]
-
-                    if (len(self.__dict__[key].shape) == 1 ):
-                        var[index] = self.__dict__[key][index]
-                    elif  (len(self.__dict__[key].shape) == 2 ):
-                        var[:,index] = self.__dict__[key][:,index]
-                    elif  (len(self.__dict__[key].shape) == 3 ):
-                        var[:,:,index] = self.__dict__[key][:,:,index]
+                    if 'transport' in key:
+                        if (len(self.__dict__[key].shape) == 1 ):
+                            var[index] = abs(self.__dict__[key][index])*self.sign[index]
+                        elif  (len(self.__dict__[key].shape) == 2 ):
+                            var[:,index] = abs(self.__dict__[key][:,index])*self.sign[:,index]
+                        elif  (len(self.__dict__[key].shape) == 3 ):
+                            var[:,:,index] = abs(self.__dict__[key][:,:,index])*self.sign[:,:,index]
+                    else:
+                        if (len(self.__dict__[key].shape) == 1 ):
+                            var[index] = self.__dict__[key][index]
+                        elif  (len(self.__dict__[key].shape) == 2 ):
+                            var[:,index] = self.__dict__[key][:,index]
+                        elif  (len(self.__dict__[key].shape) == 3 ):
+                            var[:,:,index] = self.__dict__[key][:,:,index]
                 else:
                     continue
             fid.close()
