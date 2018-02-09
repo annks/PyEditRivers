@@ -202,7 +202,6 @@ class MainToolBar(object):
 
         x, y = evt.xdata, evt.ydata
         tmp = getRiver(self, self.riv, x, y)
-
         if tmp != None:
             dlg = GetData(self.parent, tmp)
             dlg.ShowModal()

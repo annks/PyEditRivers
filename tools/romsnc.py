@@ -1,5 +1,5 @@
 from netCDF4 import Dataset
-from numpy import array, sign, where, round, argmin, abs, ones_like,squeeze, concatenate, delete, arange
+from numpy import array, sign, where, round, argmin, abs, ones_like,squeeze, concatenate, delete, arange, unique, sum
 
 import os
 import matplotlib.pyplot as plt
@@ -65,7 +65,7 @@ class river(object):
             self.direction  = self.ncfile.variables['river_direction'][where(self.xpos > -999)[0]]
             self.riverno = self.ncfile.variables['river'][where(self.xpos > -999)[0]]
             self.transport = self.ncfile.variables['river_transport'][:,where(self.xpos > -999)[0]]
-            self.sign = sign(self.transport[0,:])
+            self.sign = sign(sum(self.transport, axis=0))
             self.flag = self.ncfile.variables['river_flag'][where(self.xpos > -999)[0]]
             self.temp = self.ncfile.variables['river_temp'][:,:,where(self.xpos > -999)[0]]
             self.salt = self.ncfile.variables['river_salt'][:,:,where(self.xpos > -999)[0]]
