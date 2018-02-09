@@ -213,9 +213,9 @@ class river(object):
                         if (len(self.__dict__[key].shape) == 1 ):
                             var[index] = abs(self.__dict__[key][index])*self.sign[index]
                         elif  (len(self.__dict__[key].shape) == 2 ):
-                            var[:,index] = abs(self.__dict__[key][:,index])*self.sign[:,index]
+                            var[:,index] = abs(self.__dict__[key][:,index])*self.sign[index]
                         elif  (len(self.__dict__[key].shape) == 3 ):
-                            var[:,:,index] = abs(self.__dict__[key][:,:,index])*self.sign[:,:,index]
+                            var[:,:,index] = abs(self.__dict__[key][:,:,index])*self.sign[:,index]
                     else:
                         if (len(self.__dict__[key].shape) == 1 ):
                             var[index] = self.__dict__[key][index]
