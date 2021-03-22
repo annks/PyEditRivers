@@ -77,6 +77,8 @@ class river(object):
             self.pltid = ones_like(self.xpos, dtype=object)
             self.txtid = ones_like(self.xpos, dtype=object)
             self.backupfile = None
+            self.orgriverno = array( self.riverno[:], dtype=object)
+
         else:
             names = self.allvarnames()
             for key in names:
@@ -92,7 +94,7 @@ class river(object):
 				   'salt' : [1,'river_salt'] , 'flag' :[1,'river_flag'],
 				   'transport' : [1,'river_transport'],'sign' : [0,'sign'] ,
 				   'Vshape' : [1,'river_Vshape'],'pltid' : [0,'pltid'],
-				   'txtid' : [0,'txtid']}
+				   'txtid' : [0,'txtid'], 'orgriverno' : [0, 'orgriverno']  }
         return rivervars
 
     def __getitem__(self, index):
@@ -186,6 +188,8 @@ class river(object):
                 continue
 
         fid.close()
+        for n in range(len(self.riverno)):
+            print('River no {} consists of river(s) {} in the original file'.format(self.riverno[n], self.orgriverno[n]))
 
     def backup(self, index = None):
 

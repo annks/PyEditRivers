@@ -69,9 +69,9 @@ def mergeRivers(riv):
     unique_pos = set()
 
     for n in range(len(riv.riverno)):
-        unique_pos.add((riv.xpos[n], riv.ypos[n]))
+        unique_pos.add((riv.xpos[n], riv.ypos[n], riv.direction[n]))
     unique_pos = list(unique_pos)
-
+    print(len(unique_pos), len(riv.riverno))
     newriv = river()
     newriv.time = riv.time[:]
     newriv.salt = np.zeros([len(newriv.time), riv.salt.shape[1], 0])
@@ -83,7 +83,7 @@ def mergeRivers(riv):
 
 
     for n in range(len(unique_pos)):
-        index = np.where((riv.xpos == unique_pos[n][0]) & (riv.ypos == unique_pos[n][1]))[0]
+        index = np.where((riv.xpos == unique_pos[n][0]) & (riv.ypos == unique_pos[n][1]) & (riv.direction == unique_pos[n][2]) )[0]
         if len(index) == 1:
             newriv.riverno = np.insert(newriv.riverno, len(newriv.riverno), values = riv.riverno[index].squeeze(), axis = 0)
             newriv.xpos = np.insert(newriv.xpos, len(newriv.xpos), values = riv.xpos[index].squeeze(), axis = 0)
@@ -98,12 +98,15 @@ def mergeRivers(riv):
         else:
             if len(np.unique(riv.direction[index])) != 1:
                 print('ERROR: Attempting to merge rivers running in different directions')
+                print(np.unique(riv.riverno[index]))
                 return None
             if len(np.unique(riv.sign[index])) != 1:
                 print('ERROR: Attempting to merge rivers running in opposite directions')
+                print(np.unique(riv.riverno[index]))
                 return None
 
             newriv.riverno = np.insert(newriv.riverno, len(newriv.riverno), values = np.min(riv.riverno[index].squeeze()), axis = 0)
+            newriv.orgriverno = np.insert(newriv.orgriverno, len(newriv.orgriverno), values = list(riv.riverno[index].squeeze()), axis = 0)
             newriv.xpos = np.insert(newriv.xpos, len(newriv.xpos), values = riv.xpos[index[0]].squeeze(), axis = 0)
             newriv.ypos = np.insert(newriv.ypos, len(newriv.ypos), values = riv.ypos[index[0]].squeeze(), axis = 0)
             newriv.direction = np.insert(newriv.direction, len(newriv.direction), values = riv.direction[index[0]].squeeze(), axis = 0)
